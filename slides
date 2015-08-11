@@ -1,0 +1,225 @@
+Ruby Has Types
+!TITLE
+Ruby Types
+Turns Out™ They are Better Than Using Hashes and Strings for Everything
+
+!CODE: language=ruby
+class Product
+  attr_reader :name, :price
+  def initialize(name,price)
+    @name = name
+    @price = price
+  end
+end
+
+!CODE: language=ruby
+macbook      = Product.new("Macbook"     , 999.10)
+macbook2     = Product.new("Macbook 2"   , "999.10")
+power_supply = Product.new("Power Brick" , 20.20)
+lazer_watch  = Product.new("JBIWLC-5000" , 100000.1234)
+
+#
+
+!SECTION
+Are <code>macbook</code> and <code>macbook2</code> the same price?
+
+!CODE: language=ruby, callout=1,2
+macbook      = Product.new("Macbook"     , 999.10)
+macbook2     = Product.new("Macbook 2"   , "999.10")
+power_supply = Product.new("Power Brick" , 20.20)
+lazer_watch  = Product.new("JBIWLC-5000" , 100000.1234)
+
+!CODE: language=ruby
+
+macbook.price == macbook2.price
+
+# => false
+
+
+!SECTION
+How much for a Macbook and a Power Brick?
+
+!CODE: language=ruby, callout=1,3
+macbook      = Product.new("Macbook"     , 999.10)
+macbook2     = Product.new("Macbook 2"   , "999.10")
+power_supply = Product.new("Power Brick" , 20.20)
+lazer_watch  = Product.new("JBIWLC-5000" , 100000.1234)
+
+!CODE: language=ruby
+macbook.price + power_supply.price
+
+# => 1019.3000000000001 
+
+!SECTION
+Where do I get 34/100<sup>ths</sup> of a cent?
+
+!CODE: language=ruby
+require 'bigdecimal'
+
+class Price
+
+  attr_reader :price
+
+  def initialize(price)
+    @price = BigDecimal.new(price.to_s)
+  end
+
+  def to_s
+    @price.to_s("F")
+  end
+end
+
+!CODE: language=ruby
+macbook      = Product.new("Macbook"     , Price.new(999.10))
+macbook2     = Product.new("Macbook 2"   , Price.new("999.10"))
+power_supply = Product.new("Power Brick" , Price.new(20.20))
+
+#
+
+!SECTION
+Are <code>macbook</code> and <code>macbook2</code> the same price?
+
+!CODE: language=ruby
+class Price
+  def ==(other)
+    @price == other.price
+  end
+end
+
+macbook.price == macbook2.price
+
+# => true
+
+
+!SECTION
+How much for a Macbook and a Power Brick?
+
+!CODE: language=ruby
+class Price
+  def +(other)
+    Price.new(@price + other.price)
+  end
+end
+
+macbook.price + power_supply.price
+
+# => 1019.3
+
+!SECTION
+Where do I get 34/100<sup>ths</sup> of a cent?
+
+!CODE: language=ruby, callout=4,5,6
+class Price
+  def initialize(price)
+    @price = BigDecimal.new(price.to_s)
+    if @price.round(2) != @price
+      raise "#{price} is not a price"
+    end
+  end
+end
+
+lazer_watch  = Product.new("JBIWLC-5000" , Price.new(100000.1234))
+
+# => RuntimeError: 100000.1234 is not a price
+
+!SECTION
+What's half-off $15.55?
+
+!CODE: language=ruby
+class Price
+  def /(other)
+    Price.new(@price / other)
+  end
+end
+
+!CODE: language=ruby
+Price.new("15.55") / 2
+
+# => RuntimeError: 0.7775E1 is not a price
+
+!SECTION
+Had we used floats or strings, 
+somewhere that half a cent would get rounded.
+
+!SECTION
+Would you know where?
+
+!IMAGE
+superman_3.jpg
+
+!IMAGE
+office_space.jpg
+
+!SECTION
+<code>Price</code> is a <em>Data Type</em>
+
+!BULLETS
+Data Type
+* Set of allowed values
+* Set of allowed operations
+
+!BULLETS
+Half-off
+* 15.55 is an allowed value
+* Divide by an integer is an allowed operation
+* 7.775—the result of dividing 15.55 by 2—is <strong>not</strong> an allowed value
+
+!SECTION
+We haven't thought through our “half-off” feature
+
+!CODE: language=ruby, callout=4
+class Price
+  def /(other)
+    quotient = @price / other
+    Price.new(quotient.round(2,:banker))
+  end
+end
+
+!BULLETS
+Questions
+* When dividing prices, what rounding method do we use?
+* <strong>A:</strong> <code>Price</code>
+* Can there be negative prices?
+* <strong>A:</strong> <code>Price</code>
+* etc.
+
+!SECTION
+But the world wants nothing but Strings!!!!
+
+!CODE: language=json
+{
+  "product": {
+    "name": "MacBook",
+    "price": "999.999"
+  }
+}
+
+!CODE: language=sql
+INSERT INTO 
+  products(name,price)
+VALUES
+  ("MacBook",999.999)
+
+!CODE: language=ruby
+product.update_attribute(:price,"999.999")
+
+#
+
+!BULLETS
+Strings & Hashes are for <em>Serialization</em>
+* Your database
+* APIs
+* User Input
+* Files
+
+!SECTION
+They are not the basis of sound logic
+
+!SECTION
+They are not the basis of testable code
+
+!SECTION
+They are not the basis of reliable systems
+
+!SECTION
+
