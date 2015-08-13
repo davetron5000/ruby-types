@@ -40,7 +40,7 @@
 <pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class Product</span>
 <span class='line line-2 ' >  attr_reader :name, :price</span>
 <span class='line line-3 ' >  def initialize(name,price)</span>
-<span class='line line-4 ' >    @name = name</span>
+<span class='line line-4 ' >    @name  = name</span>
 <span class='line line-5 ' >    @price = price</span>
 <span class='line line-6 ' >  end</span>
 <span class='line line-7 ' >end</span></code></pre>
@@ -92,20 +92,6 @@
 <li>Allowing bugs to be introduced in one place…</li>
 <li>…but manifest in another</li>
 </ul>
-</section>
-<section class='CODE'>
-<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class Product</span>
-<span class='line line-2 ' >  def initialize(name,price)</span>
-<span class='line line-3 ' >    @name = name</span>
-<span class='line line-4 ' >    if a_lot == price ||</span>
-<span class='line line-5 ' >       of_checks == price ||</span>
-<span class='line line-6 ' >       and_other_validations == price ||</span>
-<span class='line line-7 ' >       that.might(:should).not_be(:here)</span>
-<span class='line line-8 ' >      @price = price</span>
-<span class='line line-9 ' >    end</span>
-<span class='line line-10 ' ></span>
-<span class='line line-11 ' >  end</span>
-<span class='line line-12 ' >end</span></code></pre>
 </section>
 <section class='CODE'>
 <pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class Price</span>
@@ -297,17 +283,6 @@
 <span class='line line-5 ' >                       database: "somedatabase",</span>
 <span class='line line-6 ' >                          poool: 25).to_active_record_config)</span>
 <span class='line line-7 ' ># => ArgumentError: unknown keyword: poool</span></code></pre>
-</section>
-<section class='CODE'>
-<pre><code class='ruby,' data-strikeouts='' data-callout-lines='3,7'><span class='line line-1 ' >class PostgresConnection</span>
-<span class='line line-2 ' >  def initialize(host:, username:, password:, database:, pool: 5)</span>
-<div class='lines-callout'><span class='line line-3 line-callout' >    @host     = Hostname.new(host)</span>
-</div><span class='line line-4 ' >    @username = username</span>
-<span class='line line-5 ' >    @password = password</span>
-<span class='line line-6 ' >    @database = database</span>
-<div class='lines-callout'><span class='line line-7 line-callout' >    @pool     = PoolSize.new(pool)</span>
-</div><span class='line line-8 ' >  end</span>
-<span class='line line-9 ' >end</span></code></pre>
 </section>
 <section class='SECTION'>
 <h1>But the world wants nothing but Strings and Hashes!!!!</h1>
@@ -597,30 +572,48 @@
 <span class='line line-85 ' >  ]</span>
 <span class='line line-86 ' >}</span></code></pre>
 </section>
-<section class='BULLETS'>
-<h1>Two options</h1>
-<ul>
-<li>Wrap in an object-like wrapper</li>
-<li>Pluck what you need into a proper data type</li>
-</ul>
+<section class='SECTION'>
+<h1>Pluck What You NNeed</h1>
 </section>
 <section class='CODE'>
-<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >response = Hashie::Mash.new(JSON.parse(response_from_github))</span>
-<span class='line line-2 ' >response.files[0].filename</span>
-<span class='line line-3 ' ># => "file1.txt"</span></code></pre>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class Author</span>
+<span class='line line-2 ' ></span>
+<span class='line line-3 ' >  attr_reader :login, :avatar_url</span>
+<span class='line line-4 ' ></span>
+<span class='line line-5 ' >  def initialize(hash)</span>
+<span class='line line-6 ' >    @login = hash[:login]</span>
+<span class='line line-7 ' >    @avatar_url = hash[:avatar_url]</span>
+<span class='line line-8 ' >  end</span>
+<span class='line line-9 ' ></span>
+<span class='line line-10 ' >  def to_h</span>
+<span class='line line-11 ' >    {</span>
+<span class='line line-12 ' >      login: @login,</span>
+<span class='line line-13 ' >      avatar_url: @avatar_url,</span>
+<span class='line line-14 ' >    }</span>
+<span class='line line-15 ' >  end</span>
+<span class='line line-16 ' >end</span>
+<span class='line line-17 ' ></span>
+<span class='line line-18 ' >class Commit</span>
+<span class='line line-19 ' ></span>
+<span class='line line-20 ' >  attr_reader :url, :sha, :author</span>
+<span class='line line-21 ' ></span>
+<span class='line line-22 ' >  def initialize(hash)</span>
+<span class='line line-23 ' >    @url = hash[:url]</span>
+<span class='line line-24 ' >    @sha = hash[:sha]</span>
+<span class='line line-25 ' >    @author = hash[:author]</span>
+<span class='line line-26 ' >  end</span>
+<span class='line line-27 ' ></span>
+<span class='line line-28 ' >  def to_h</span>
+<span class='line line-29 ' >    {</span>
+<span class='line line-30 ' >      url: @url,</span>
+<span class='line line-31 ' >      sha: @sha,</span>
+<span class='line line-32 ' >      author: @author,</span>
+<span class='line line-33 ' >    }</span>
+<span class='line line-34 ' >  end</span>
+<span class='line line-35 ' >end</span></code></pre>
 </section>
-<section class='NORMAL'>
-<h1>Not a real data type</h1>
-</section>
-<section class='NORMAL'>
-<h1><em>But</em>…users don't have to deal with magic strings—you can replace it with a real data type later, based on usage</h1>
-</section>
-<section class='BULLETS'>
-<h1>Pluck What you need</h1>
-<ul>
-<li>Make a class each time</li>
-<li>Use a class factory like <a href="https://github.com/tcrayford/Values">Values</a> or <a href="https://github.com/stitchfix/immutable-struct">immutable-struct</a></li>
-</ul>
+<section class='SECTION'>
+<h1>Or: use a class factory like <a href="https://github.com/tcrayford/Values">Values</a> or <a href="https://github.com/stitchfix/immutable-struct">immutable-struct</a></h1>
 </section>
 <section class='CODE'>
 <pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >Author = ImmutableStruct.new(:login, :avatar_url)</span>
@@ -629,7 +622,7 @@
 <span class='line line-4 ' >#</span></code></pre>
 </section>
 <section class='COMMANDLINE'>
-<pre><code class='no-highlight'><span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> Author.new(login: "davetron5000", avatar_url: "http://...")</span>
+<pre><code class='no-highlight'><span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> Author.new(login: "davetron5000", avatar_url: "http://...", foobar: "blah")</span>
 <span class='cli-element cli-result'><span class='cli-line'>&lt;#Author @login="davetron5000" @avatar_url="http://..." &gt;</span></span>
 <span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> author = Author.new(github_response["author"])</span>
 <span class='cli-element cli-result'><span class='cli-line'>&lt;#Author ... &gt;</span></span>
@@ -670,6 +663,9 @@
 <section class='SECTION'>
 <h1>Thanks!</h1>
 <h2>Dave Copeland | @davetron5000</h2>
+</section>
+<section class='IMAGE'>
+<img src='cover.jpg'>
 </section>
 <section class='SECTION'>
 <h1>Come Work at Stitch Fix</h1>

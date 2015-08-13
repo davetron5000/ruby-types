@@ -7,7 +7,7 @@ Turns Out™ They are Better Than Using Hashes and Strings for Everything
 class Product
   attr_reader :name, :price
   def initialize(name,price)
-    @name = name
+    @name  = name
     @price = price
   end
 end
@@ -57,20 +57,6 @@ The problem here
 * <code>Product</code> is being mis-used
 * Allowing bugs to be introduced in one place…
 * …but manifest in another
-
-!CODE: language=ruby
-class Product
-  def initialize(name,price)
-    @name = name
-    if a_lot == price ||
-       of_checks == price ||
-       and_other_validations == price ||
-       that.might(:should).not_be(:here)
-      @price = price
-    end
-
-  end
-end
 
 !CODE: language=ruby
 class Price
@@ -260,17 +246,6 @@ ActiveRecord.establish_connection(
                        database: "somedatabase",
                           poool: 25).to_active_record_config)
 # => ArgumentError: unknown keyword: poool
-
-!CODE: language=ruby, callout=3,7
-class PostgresConnection
-  def initialize(host:, username:, password:, database:, pool: 5)
-    @host     = Hostname.new(host)
-    @username = username
-    @password = password
-    @database = database
-    @pool     = PoolSize.new(pool)
-  end
-end
 
 !SECTION
 But the world wants nothing but Strings and Hashes!!!!
@@ -551,26 +526,48 @@ What about complex types e.g. API responses?
   ]
 }
 
-!BULLETS
-Two options
-* Wrap in an object-like wrapper
-* Pluck what you need into a proper data type
+!SECTION
+Pluck What You NNeed
 
 !CODE: language=ruby
-response = Hashie::Mash.new(JSON.parse(response_from_github))
-response.files[0].filename
-# => "file1.txt"
+class Author
 
-!NORMAL
-Not a real data type
+  attr_reader :login, :avatar_url
 
-!NORMAL
-<em>But</em>…users don't have to deal with magic strings—you can replace it with a real data type later, based on usage
+  def initialize(hash)
+    @login = hash[:login]
+    @avatar_url = hash[:avatar_url]
+  end
 
-!BULLETS
-Pluck What you need
-* Make a class each time
-* Use a class factory like <a href="https://github.com/tcrayford/Values">Values</a> or <a href="https://github.com/stitchfix/immutable-struct">immutable-struct</a>
+  def to_h
+    {
+      login: @login,
+      avatar_url: @avatar_url,
+    }
+  end
+end
+
+class Commit
+
+  attr_reader :url, :sha, :author
+
+  def initialize(hash)
+    @url = hash[:url]
+    @sha = hash[:sha]
+    @author = hash[:author]
+  end
+
+  def to_h
+    {
+      url: @url,
+      sha: @sha,
+      author: @author,
+    }
+  end
+end
+
+!SECTION
+Or: use a class factory like <a href="https://github.com/tcrayford/Values">Values</a> or <a href="https://github.com/stitchfix/immutable-struct">immutable-struct</a>
 
 !CODE: language=ruby
 Author = ImmutableStruct.new(:login, :avatar_url)
@@ -579,7 +576,7 @@ Commit = ImmutableStruct.new(:url, :sha, :author)
 #
 
 !COMMANDLINE
-> Author.new(login: "davetron5000", avatar_url: "http://...")
+> Author.new(login: "davetron5000", avatar_url: "http://...", foobar: "blah")
 &lt;#Author @login="davetron5000" @avatar_url="http://..." &gt;
 > author = Author.new(github_response["author"])
 &lt;#Author ... &gt;
@@ -615,6 +612,9 @@ In Conclusion
 !SECTION
 Thanks!
 Dave Copeland | @davetron5000
+
+!IMAGE
+cover.jpg
 
 !SECTION
 Come Work at Stitch Fix
