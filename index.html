@@ -57,23 +57,22 @@
 <h1>Are <code>macbook</code> and <code>macbook2</code> the same price?</h1>
 </section>
 <section class='CODE'>
-<pre><code class='ruby,' data-strikeouts='' data-callout-lines='1,2'><div class='lines-callout'><span class='line line-1 line-callout' >macbook      = Product.new("Macbook"     , 999.10)</span>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines='1,2'><div class='lines-callout'><span class='line line-1 line-callout' >macbook      = Product.new("Macbook"     , 999.10)</span>
 <span class='line line-2 line-callout' >macbook2     = Product.new("Macbook 2"   , "999.10")</span>
 </div><span class='line line-3 ' >power_supply = Product.new("Power Brick" , 20.20)</span>
 <span class='line line-4 ' >lazer_watch  = Product.new("JBIWLC-5000" , 100000.1234)</span></code></pre>
 </section>
 <section class='CODE'>
-<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' ></span>
-<span class='line line-2 ' >macbook.price == macbook2.price</span>
-<span class='line line-3 ' ></span>
-<span class='line line-4 ' ># => false</span>
-<span class='line line-5 ' ></span></code></pre>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >macbook.price == macbook2.price</span>
+<span class='line line-2 ' ></span>
+<span class='line line-3 ' ># => false</span>
+<span class='line line-4 ' ></span></code></pre>
 </section>
 <section class='SECTION'>
 <h1>How much for a Macbook and a Power Brick?</h1>
 </section>
 <section class='CODE'>
-<pre><code class='ruby,' data-strikeouts='' data-callout-lines='1,3'><div class='lines-callout'><span class='line line-1 line-callout' >macbook      = Product.new("Macbook"     , 999.10)</span>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines='1,3'><div class='lines-callout'><span class='line line-1 line-callout' >macbook      = Product.new("Macbook"     , 999.10)</span>
 </div><span class='line line-2 ' >macbook2     = Product.new("Macbook 2"   , "999.10")</span>
 <div class='lines-callout'><span class='line line-3 line-callout' >power_supply = Product.new("Power Brick" , 20.20)</span>
 </div><span class='line line-4 ' >lazer_watch  = Product.new("JBIWLC-5000" , 100000.1234)</span></code></pre>
@@ -86,21 +85,41 @@
 <section class='SECTION'>
 <h1>Where do I get 34/100<sup>ths</sup> of a cent?</h1>
 </section>
+<section class='BULLETS'>
+<h1>The problem here</h1>
+<ul>
+<li><code>Product</code> is being mis-used</li>
+<li>Allowing bugs to be introduced in one place…</li>
+<li>…but manifest in another</li>
+</ul>
+</section>
 <section class='CODE'>
-<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >require 'bigdecimal'</span>
-<span class='line line-2 ' ></span>
-<span class='line line-3 ' >class Price</span>
-<span class='line line-4 ' ></span>
-<span class='line line-5 ' >  attr_reader :price</span>
-<span class='line line-6 ' ></span>
-<span class='line line-7 ' >  def initialize(price)</span>
-<span class='line line-8 ' >    @price = BigDecimal.new(price.to_s)</span>
-<span class='line line-9 ' >  end</span>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class Product</span>
+<span class='line line-2 ' >  def initialize(name,price)</span>
+<span class='line line-3 ' >    @name = name</span>
+<span class='line line-4 ' >    if a_lot == price ||</span>
+<span class='line line-5 ' >       of_checks == price ||</span>
+<span class='line line-6 ' >       and_other_validations == price ||</span>
+<span class='line line-7 ' >       that.might(:should).not_be(:here)</span>
+<span class='line line-8 ' >      @price = price</span>
+<span class='line line-9 ' >    end</span>
 <span class='line line-10 ' ></span>
-<span class='line line-11 ' >  def to_s</span>
-<span class='line line-12 ' >    @price.to_s("F")</span>
-<span class='line line-13 ' >  end</span>
-<span class='line line-14 ' >end</span></code></pre>
+<span class='line line-11 ' >  end</span>
+<span class='line line-12 ' >end</span></code></pre>
+</section>
+<section class='CODE'>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class Price</span>
+<span class='line line-2 ' ></span>
+<span class='line line-3 ' >  attr_reader :price</span>
+<span class='line line-4 ' ></span>
+<span class='line line-5 ' >  def initialize(price)</span>
+<span class='line line-6 ' >    @price = price</span>
+<span class='line line-7 ' >  end</span>
+<span class='line line-8 ' ></span>
+<span class='line line-9 ' >  def to_s</span>
+<span class='line line-10 ' >    @price.to_s</span>
+<span class='line line-11 ' >  end</span>
+<span class='line line-12 ' >end</span></code></pre>
 </section>
 <section class='CODE'>
 <pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >macbook      = Product.new("Macbook"     , Price.new(999.10))</span>
@@ -113,16 +132,23 @@
 <h1>Are <code>macbook</code> and <code>macbook2</code> the same price?</h1>
 </section>
 <section class='CODE'>
-<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class Price</span>
-<span class='line line-2 ' >  def ==(other)</span>
-<span class='line line-3 ' >    @price == other.price</span>
-<span class='line line-4 ' >  end</span>
-<span class='line line-5 ' >end</span>
-<span class='line line-6 ' ></span>
-<span class='line line-7 ' >macbook.price == macbook2.price</span>
+<pre><code class='ruby,' data-strikeouts='' data-callout-lines='1,6'><div class='lines-callout'><span class='line line-1 line-callout' >require 'bigdecimal'</span>
+</div><span class='line line-2 ' ></span>
+<span class='line line-3 ' >class Price</span>
+<span class='line line-4 ' ></span>
+<span class='line line-5 ' >  def initialize(price)</span>
+<div class='lines-callout'><span class='line line-6 line-callout' >    @price = BigDecimal.new(price.to_s)</span>
+</div><span class='line line-7 ' >  end</span>
 <span class='line line-8 ' ></span>
-<span class='line line-9 ' ># => true</span>
-<span class='line line-10 ' ></span></code></pre>
+<span class='line line-9 ' >  def ==(other)</span>
+<span class='line line-10 ' >    @price == other.price</span>
+<span class='line line-11 ' >  end</span>
+<span class='line line-12 ' >end</span>
+<span class='line line-13 ' ></span>
+<span class='line line-14 ' >macbook.price == macbook2.price</span>
+<span class='line line-15 ' ></span>
+<span class='line line-16 ' ># => true</span>
+<span class='line line-17 ' ></span></code></pre>
 </section>
 <section class='SECTION'>
 <h1>How much for a Macbook and a Power Brick?</h1>
@@ -142,7 +168,7 @@
 <h1>Where do I get 34/100<sup>ths</sup> of a cent?</h1>
 </section>
 <section class='CODE'>
-<pre><code class='ruby,' data-strikeouts='' data-callout-lines='4,5,6'><span class='line line-1 ' >class Price</span>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines='4,5,6'><span class='line line-1 ' >class Price</span>
 <span class='line line-2 ' >  def initialize(price)</span>
 <span class='line line-3 ' >    @price = BigDecimal.new(price.to_s)</span>
 <div class='lines-callout'><span class='line line-4 line-callout' >    if @price.round(2) != @price</span>
@@ -160,15 +186,18 @@
 </section>
 <section class='CODE'>
 <pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class Price</span>
-<span class='line line-2 ' >  def /(other)</span>
-<span class='line line-3 ' >    Price.new(@price / other)</span>
+<span class='line line-2 ' >  def /(val)</span>
+<span class='line line-3 ' >    Price.new(@price / val)</span>
 <span class='line line-4 ' >  end</span>
 <span class='line line-5 ' >end</span></code></pre>
 </section>
 <section class='CODE'>
 <pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >Price.new("15.55") / 2</span>
 <span class='line line-2 ' ></span>
-<span class='line line-3 ' ># => RuntimeError: 0.7775E1 is not a price</span></code></pre>
+<span class='line line-3 ' ># => RuntimeError: 7.775 is not a price</span></code></pre>
+</section>
+<section class='SECTION'>
+<h1>We haven't thought through our “half-off” feature</h1>
 </section>
 <section class='SECTION'>
 <h1>Had we used floats or strings, </h1>
@@ -183,87 +212,439 @@
 <section class='IMAGE'>
 <img src='office_space.jpg'>
 </section>
-<section class='SECTION'>
-<h1><code>Price</code> is a <em>Data Type</em></h1>
-</section>
-<section class='BULLETS'>
-<h1>Data Type</h1>
-<ul>
-<li>Set of allowed values</li>
-<li>Set of allowed operations</li>
-</ul>
-</section>
-<section class='BULLETS'>
-<h1>Half-off</h1>
-<ul>
-<li>15.55 is an allowed value</li>
-<li>Divide by an integer is an allowed operation</li>
-<li>7.775—the result of dividing 15.55 by 2—is <strong>not</strong> an allowed value</li>
-</ul>
-</section>
-<section class='SECTION'>
-<h1>We haven't thought through our “half-off” feature</h1>
+<section class='IMAGE'>
+<img src='rounding.png'>
 </section>
 <section class='CODE'>
-<pre><code class='ruby,' data-strikeouts='' data-callout-lines='4'><span class='line line-1 ' >class Price</span>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines='4'><span class='line line-1 ' >class Price</span>
 <span class='line line-2 ' >  def /(other)</span>
 <span class='line line-3 ' >    quotient = @price / other</span>
 <div class='lines-callout'><span class='line line-4 line-callout' >    Price.new(quotient.round(2,:banker))</span>
 </div><span class='line line-5 ' >  end</span>
 <span class='line line-6 ' >end</span></code></pre>
 </section>
+<section class='SECTION'>
+<h1><code>Price</code> is a <em>Data Type</em></h1>
+</section>
 <section class='BULLETS'>
-<h1>Questions</h1>
+<h1>Data Type</h1>
 <ul>
-<li>When dividing prices, what rounding method do we use?</li>
-<li><strong>A:</strong> <code>Price</code></li>
-<li>Can there be negative prices?</li>
-<li><strong>A:</strong> <code>Price</code></li>
-<li>etc.</li>
+<li>Set of allowed values (999, 20.20, but <em>not</em> 100000.1234)</li>
+<li>Set of allowed operations (<code>==</code>, <code>+</code>, <code>/</code>)</li>
 </ul>
 </section>
 <section class='SECTION'>
-<h1>But the world wants nothing but Strings!!!!</h1>
+<h1><code>Price</code> becomes the embodiment of our domain decisions around pricing.</h1>
+<h2>(which kinda makes sense)</h2>
+</section>
+<section class='SECTION'>
+<h1>Data Types aren't just for wrapping values</h1>
+</section>
+<section class='CODE'>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >ActiveRecord::Base.establish_connection(</span>
+<span class='line line-2 ' >  adapter:  "postgres",</span>
+<span class='line line-3 ' >  host:     "localhost",</span>
+<span class='line line-4 ' >  username: "myuser",</span>
+<span class='line line-5 ' >  password: "mypass",</span>
+<span class='line line-6 ' >  database: "somedatabase",</span>
+<span class='line line-7 ' >  poool:    25,</span>
+<span class='line line-8 ' >)</span></code></pre>
+</section>
+<section class='CODE'>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines='7'><span class='line line-1 ' >ActiveRecord::Base.establish_connection(</span>
+<span class='line line-2 ' >  adapter:  "postgres",</span>
+<span class='line line-3 ' >  host:     "localhost",</span>
+<span class='line line-4 ' >  username: "myuser",</span>
+<span class='line line-5 ' >  password: "mypass",</span>
+<span class='line line-6 ' >  database: "somedatabase",</span>
+<div class='lines-callout'><span class='line line-7 line-callout' >  poool:    25,</span>
+</div><span class='line line-8 ' >)</span></code></pre>
+</section>
+<section class='NORMAL'>
+<h1>Magic. Strings.</h1>
+</section>
+<section class='CODE'>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class PostgresConnection</span>
+<span class='line line-2 ' >  def initialize(host:,</span>
+<span class='line line-3 ' >                 username:,</span>
+<span class='line line-4 ' >                 password:,</span>
+<span class='line line-5 ' >                 database:,</span>
+<span class='line line-6 ' >                 pool: 5)</span>
+<span class='line line-7 ' >    @host     = host</span>
+<span class='line line-8 ' >    @username = username</span>
+<span class='line line-9 ' >    @password = password</span>
+<span class='line line-10 ' >    @database = database</span>
+<span class='line line-11 ' >    @pool     = pool</span>
+<span class='line line-12 ' >  end</span>
+<span class='line line-13 ' ></span>
+<span class='line line-14 ' >  def to_active_record_config</span>
+<span class='line line-15 ' >    {</span>
+<span class='line line-16 ' >       adapter: "postgres",</span>
+<span class='line line-17 ' >          host: @host,</span>
+<span class='line line-18 ' >      username: @username,</span>
+<span class='line line-19 ' >      password: @password,</span>
+<span class='line line-20 ' >      database: @database,</span>
+<span class='line line-21 ' >          pool: @pool,</span>
+<span class='line line-22 ' >    }</span>
+<span class='line line-23 ' >  end</span>
+<span class='line line-24 ' >end</span></code></pre>
+</section>
+<section class='CODE'>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >ActiveRecord.establish_connection(PostgresConnection.new(</span>
+<span class='line line-2 ' >                                       host: "localhost",</span>
+<span class='line line-3 ' >                                   username: "myuser",</span>
+<span class='line line-4 ' >                                   password: "mypass",</span>
+<span class='line line-5 ' >                                   database: "somedatabase",</span>
+<span class='line line-6 ' >                                      poool: 25,</span>
+<span class='line line-7 ' >                                 ).to_active_record_config)</span>
+<span class='line line-8 ' ># => ArgumentError: unknown keyword: poool</span></code></pre>
+</section>
+<section class='SECTION'>
+<h1>But the world wants nothing but Strings and Hashes!!!!</h1>
+</section>
+<section class='SECTION'>
+<h1>Hashes, Strings, Number, Symbols etc. are <strong>primitives</strong> to use for <em>building</em> data types.</h1>
+</section>
+<section class='SECTION'>
+<h1>Avoid using them directly</h1>
+<h2>Convert primitives to your types early and often</h2>
+</section>
+<section class='SECTION'>
+<h1>Consider the seams of your application</h1>
+</section>
+<section class='IMAGE'>
+<img src='app.png'>
+</section>
+<section class='IMAGE'>
+<img src='app_seams.png'>
+</section>
+<section class='IMAGE'>
+<img src='app_adapt.png'>
+</section>
+<section class='SECTION'>
+<h1>How?</h1>
+</section>
+<section class='SECTION'>
+<h1>Database/ActiveRecord</h1>
+</section>
+<section class='CODE'>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class Product < ActiveRecord::Base</span>
+<span class='line line-2 ' >  serialize :price, Price</span>
+<span class='line line-3 ' >end</span></code></pre>
+</section>
+<section class='CODE'>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class Price</span>
+<span class='line line-2 ' >  def self.load(raw)</span>
+<span class='line line-3 ' >    self.new(raw)</span>
+<span class='line line-4 ' >  end</span>
+<span class='line line-5 ' ></span>
+<span class='line line-6 ' >  def self.dump(price)</span>
+<span class='line line-7 ' >    price.to_s</span>
+<span class='line line-8 ' >  end</span>
+<span class='line line-9 ' >end</span></code></pre>
+</section>
+<section class='COMMANDLINE'>
+<pre><code class='no-highlight'><span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> Product.connection.execute("update product set price=123.456 where id = 23")</span>
+<span class='cli-element cli-result'><span class='cli-line'>true</span></span>
+<span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> Product.find(23)</span>
+<span class='cli-element cli-result'><span class='cli-line'>ArgumentError: 123.456 is not a price</span></span>
+</code></pre>
+</section>
+<section class='SECTION'>
+<h1>Bugs: Contained</h1>
+</section>
+<section class='BULLETS'>
+<h1>User Input</h1>
+<ul>
+<li>Wrap as necessary</li>
+<li>Conventions can help</li>
+<li>This is the trickiest</li>
+</ul>
+</section>
+<section class='SECTION'>
+<h1>Example</h1>
+</section>
+<section class='CODE'>
+<pre><code data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >puts "Create a new Product"</span>
+<span class='line line-2 ' ></span>
+<span class='line line-3 ' >puts "Name?"</span>
+<span class='line line-4 ' >name = readline</span>
+<span class='line line-5 ' ></span>
+<span class='line line-6 ' >puts "Price?"</span>
+<span class='line line-7 ' >price = readline</span>
+<span class='line line-8 ' ></span>
+<span class='line line-9 ' >Product.new(name,Price.new(price))</span></code></pre>
+</section>
+<section class='SECTION'>
+<h1>This is a bit tedious</h1>
+</section>
+<section class='CODE'>
+<pre><code data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class Product</span>
+<span class='line line-2 ' >  def initialize(name,price)</span>
+<span class='line line-3 ' >    @name  = name</span>
+<span class='line line-4 ' >    @price = price.kind_of?(Price) ? price : Price.new(price)</span>
+<span class='line line-5 ' >  end</span>
+<span class='line line-6 ' >end</span>
+<span class='line line-7 ' ></span>
+<span class='line line-8 ' >Product.new(name,price)</span>
+<span class='line line-9 ' >Product.new(name,Price.new(price))</span></code></pre>
+</section>
+<section class='SECTION'>
+<h1>Conversion Function</h1>
+</section>
+<section class='COMMANDLINE'>
+<pre><code class='no-highlight'><span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> Integer(10)</span>
+<span class='cli-element cli-result'><span class='cli-line'>10 </span></span>
+<span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> Integer("10")</span>
+<span class='cli-element cli-result'><span class='cli-line'>10 </span></span>
+<span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> Float(10.0)</span>
+<span class='cli-element cli-result'><span class='cli-line'>10.0 </span></span>
+<span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> Float("10")</span>
+<span class='cli-element cli-result'><span class='cli-line'>10.0 </span></span>
+<span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> Array([1,2,3])</span>
+<span class='cli-element cli-result'><span class='cli-line'>[1, 2, 3] </span></span>
+<span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> Array(nil)</span>
+<span class='cli-element cli-result'><span class='cli-line'>[] </span></span>
+</code></pre>
+</section>
+<section class='CODE'>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class Product</span>
+<span class='line line-2 ' >  def initialize(name,price)</span>
+<span class='line line-3 ' >    @name  = name</span>
+<span class='line line-4 ' >    @price = Price(price)</span>
+<span class='line line-5 ' >  end</span>
+<span class='line line-6 ' >end</span>
+<span class='line line-7 ' ></span>
+<span class='line line-8 ' >Product.new(name,price)</span></code></pre>
+</section>
+<section class='SECTION'>
+<h1>Protocols</h1>
+</section>
+<section class='BULLETS'>
+<h1>Opt-in to say “I can be treated as an XXX”</h1>
+<ul>
+<li><code>to_int</code> - I can be treated as an <code>Int</code></li>
+<li><code>to_ary</code> - I can be treated as an <code>Array</code></li>
+<li><code>to_str</code> - I can be treated as a <code>String</code></li>
+</ul>
+</section>
+<section class='BULLETS'>
+<h1>Not be cofused with <em>representations</em></h1>
+<ul>
+<li><code>to_i</code> - I can be <em>represented</em> as an <code>Int</code></li>
+<li><code>to_a</code> - I can be <em>represented</em> as an <code>Array</code></li>
+<li><code>to_s</code> - I can be <em>represented</em> as a <code>String</code></li>
+</ul>
+</section>
+<section class='COMMANDLINE'>
+<pre><code class='no-highlight'><span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> "Answer is: " + true</span>
+<span class='cli-element cli-result'><span class='cli-line'>TypeError: no implicit conversion of true into String</span>
+<span class='cli-line'>	from (irb):1:in `+'</span>
+<span class='cli-line'>	from (irb):1</span>
+<span class='cli-line'>	from /Users/davec/.rvm/rubies/ruby-2.1.5/bin/irb:11:in `<main>'</span></span>
+<span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> class TrueClass</span>
+<span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'>   def to_str; to_s; end</span>
+<span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> end</span>
+<span class='cli-element cli-result'><span class='cli-line'> => :to_str </span>
+<span class='cli-line'>2.1.5 :007 > "Answer is: " + true</span>
+<span class='cli-line'> => "Answer is: true" </span></span>
+</code></pre>
+</section>
+<section class='CODE'>
+<pre><code data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class Price</span>
+<span class='line line-2 ' >  def to_price</span>
+<span class='line line-3 ' >    self</span>
+<span class='line line-4 ' >  end</span>
+<span class='line line-5 ' ></span>
+<span class='line line-6 ' >  def initialize(price)</span>
+<span class='line line-7 ' >    @price = begin</span>
+<span class='line line-8 ' >               price.to_price.price</span>
+<span class='line line-9 ' >             rescue NoMethodError</span>
+<span class='line line-10 ' >               BigDecimal.new(price.to_s)</span>
+<span class='line line-11 ' >             end</span>
+<span class='line line-12 ' >  end</span>
+<span class='line line-13 ' >end</span></code></pre>
+</section>
+<section class='CODE'>
+<pre><code data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class Share</span>
+<span class='line line-2 ' >  def initialize(symbol,share_price)</span>
+<span class='line line-3 ' >    @symbol = symbol</span>
+<span class='line line-4 ' >    @share_price = share_price</span>
+<span class='line line-5 ' >  end</span>
+<span class='line line-6 ' ></span>
+<span class='line line-7 ' >  def to_price</span>
+<span class='line line-8 ' >    Price.new(@share_price)</span>
+<span class='line line-9 ' >  end</span>
+<span class='line line-10 ' >end</span></code></pre>
+</section>
+<section class='NORMAL'>
+<h1>Conversion functions and protocols let you safely convert where you need it</h1>
+</section>
+<section class='SECTION'>
+<h1>What about complex types e.g. API responses?</h1>
+</section>
+<section class='SECTION'>
+<h1>Easily convert between a <code>Hash</code> and your data type</h1>
+</section>
+<section class='BULLETS'>
+<h1>Class Factories</h1>
+<ul>
+<li><a href="https://github.com/tcrayford/Values">Values</a></li>
+<li><a href="https://github.com/stitchfix/immutable-struct">immutable-struct</a></li>
+</ul>
+</section>
+<section class='CODE'>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >Product = ImmutableStruct.new(:name, :price)</span>
+<span class='line line-2 ' ></span>
+<span class='line line-3 ' >hash = {</span>
+<span class='line line-4 ' >  name: "MacBook",</span>
+<span class='line line-5 ' >  price: Price(999.10),</span>
+<span class='line line-6 ' >}</span>
+<span class='line line-7 ' >macbook = Product.new(has)</span>
+<span class='line line-8 ' >macbook.to_h</span>
+<span class='line line-9 ' ># => { "name" => "MacBook", price: "999.10" }</span></code></pre>
+</section>
+<section class='SECTION'>
+<h1>But…</h1>
 </section>
 <section class='CODE'>
 <pre><code class='json' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >{</span>
-<span class='line line-2 ' >  "product": {</span>
-<span class='line line-3 ' >    "name": "MacBook",</span>
-<span class='line line-4 ' >    "price": "999.999"</span>
-<span class='line line-5 ' >  }</span>
-<span class='line line-6 ' >}</span></code></pre>
+<span class='line line-2 ' >  "url": "https://api.github.com/repos/octocat/Hello-World/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e",</span>
+<span class='line line-3 ' >  "sha": "6dcb09b5b57875f334f61aebed695e2e4193db5e",</span>
+<span class='line line-4 ' >  "html_url": "https://github.com/octocat/Hello-World/commit/6dcb09b5b57875f334f61aebed695e2e4193db5e",</span>
+<span class='line line-5 ' >  "comments_url": "https://api.github.com/repos/octocat/Hello-World/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e/comments",</span>
+<span class='line line-6 ' >  "commit": {</span>
+<span class='line line-7 ' >    "url": "https://api.github.com/repos/octocat/Hello-World/git/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e",</span>
+<span class='line line-8 ' >    "author": {</span>
+<span class='line line-9 ' >      "name": "Monalisa Octocat",</span>
+<span class='line line-10 ' >      "email": "support@github.com",</span>
+<span class='line line-11 ' >      "date": "2011-04-14T16:00:49Z"</span>
+<span class='line line-12 ' >    },</span>
+<span class='line line-13 ' >    "committer": {</span>
+<span class='line line-14 ' >      "name": "Monalisa Octocat",</span>
+<span class='line line-15 ' >      "email": "support@github.com",</span>
+<span class='line line-16 ' >      "date": "2011-04-14T16:00:49Z"</span>
+<span class='line line-17 ' >    },</span>
+<span class='line line-18 ' >    "message": "Fix all the bugs",</span>
+<span class='line line-19 ' >    "tree": {</span>
+<span class='line line-20 ' >      "url": "https://api.github.com/repos/octocat/Hello-World/tree/6dcb09b5b57875f334f61aebed695e2e4193db5e",</span>
+<span class='line line-21 ' >      "sha": "6dcb09b5b57875f334f61aebed695e2e4193db5e"</span>
+<span class='line line-22 ' >    },</span>
+<span class='line line-23 ' >    "comment_count": 0</span>
+<span class='line line-24 ' >  },</span>
+<span class='line line-25 ' >  "author": {</span>
+<span class='line line-26 ' >    "login": "octocat",</span>
+<span class='line line-27 ' >    "id": 1,</span>
+<span class='line line-28 ' >    "avatar_url": "https://github.com/images/error/octocat_happy.gif",</span>
+<span class='line line-29 ' >    "gravatar_id": "",</span>
+<span class='line line-30 ' >    "url": "https://api.github.com/users/octocat",</span>
+<span class='line line-31 ' >    "html_url": "https://github.com/octocat",</span>
+<span class='line line-32 ' >    "followers_url": "https://api.github.com/users/octocat/followers",</span>
+<span class='line line-33 ' >    "following_url": "https://api.github.com/users/octocat/following{/other_user}",</span>
+<span class='line line-34 ' >    "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",</span>
+<span class='line line-35 ' >    "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",</span>
+<span class='line line-36 ' >    "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",</span>
+<span class='line line-37 ' >    "organizations_url": "https://api.github.com/users/octocat/orgs",</span>
+<span class='line line-38 ' >    "repos_url": "https://api.github.com/users/octocat/repos",</span>
+<span class='line line-39 ' >    "events_url": "https://api.github.com/users/octocat/events{/privacy}",</span>
+<span class='line line-40 ' >    "received_events_url": "https://api.github.com/users/octocat/received_events",</span>
+<span class='line line-41 ' >    "type": "User",</span>
+<span class='line line-42 ' >    "site_admin": false</span>
+<span class='line line-43 ' >  },</span>
+<span class='line line-44 ' >  "committer": {</span>
+<span class='line line-45 ' >    "login": "octocat",</span>
+<span class='line line-46 ' >    "id": 1,</span>
+<span class='line line-47 ' >    "avatar_url": "https://github.com/images/error/octocat_happy.gif",</span>
+<span class='line line-48 ' >    "gravatar_id": "",</span>
+<span class='line line-49 ' >    "url": "https://api.github.com/users/octocat",</span>
+<span class='line line-50 ' >    "html_url": "https://github.com/octocat",</span>
+<span class='line line-51 ' >    "followers_url": "https://api.github.com/users/octocat/followers",</span>
+<span class='line line-52 ' >    "following_url": "https://api.github.com/users/octocat/following{/other_user}",</span>
+<span class='line line-53 ' >    "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",</span>
+<span class='line line-54 ' >    "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",</span>
+<span class='line line-55 ' >    "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",</span>
+<span class='line line-56 ' >    "organizations_url": "https://api.github.com/users/octocat/orgs",</span>
+<span class='line line-57 ' >    "repos_url": "https://api.github.com/users/octocat/repos",</span>
+<span class='line line-58 ' >    "events_url": "https://api.github.com/users/octocat/events{/privacy}",</span>
+<span class='line line-59 ' >    "received_events_url": "https://api.github.com/users/octocat/received_events",</span>
+<span class='line line-60 ' >    "type": "User",</span>
+<span class='line line-61 ' >    "site_admin": false</span>
+<span class='line line-62 ' >  },</span>
+<span class='line line-63 ' >  "parents": [</span>
+<span class='line line-64 ' >    {</span>
+<span class='line line-65 ' >      "url": "https://api.github.com/repos/octocat/Hello-World/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e",</span>
+<span class='line line-66 ' >      "sha": "6dcb09b5b57875f334f61aebed695e2e4193db5e"</span>
+<span class='line line-67 ' >    }</span>
+<span class='line line-68 ' >  ],</span>
+<span class='line line-69 ' >  "stats": {</span>
+<span class='line line-70 ' >    "additions": 104,</span>
+<span class='line line-71 ' >    "deletions": 4,</span>
+<span class='line line-72 ' >    "total": 108</span>
+<span class='line line-73 ' >  },</span>
+<span class='line line-74 ' >  "files": [</span>
+<span class='line line-75 ' >    {</span>
+<span class='line line-76 ' >      "filename": "file1.txt",</span>
+<span class='line line-77 ' >      "additions": 10,</span>
+<span class='line line-78 ' >      "deletions": 2,</span>
+<span class='line line-79 ' >      "changes": 12,</span>
+<span class='line line-80 ' >      "status": "modified",</span>
+<span class='line line-81 ' >      "raw_url": "https://github.com/octocat/Hello-World/raw/7ca483543807a51b6079e54ac4cc392bc29ae284/file1.txt",</span>
+<span class='line line-82 ' >      "blob_url": "https://github.com/octocat/Hello-World/blob/7ca483543807a51b6079e54ac4cc392bc29ae284/file1.txt",</span>
+<span class='line line-83 ' >      "patch": "@@ -29,7 +29,7 @@\n....."</span>
+<span class='line line-84 ' >    }</span>
+<span class='line line-85 ' >  ]</span>
+<span class='line line-86 ' >}</span></code></pre>
+</section>
+<section class='NORMAL'>
+<h1>Two strategies</h1>
 </section>
 <section class='CODE'>
-<pre><code class='sql' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >INSERT INTO </span>
-<span class='line line-2 ' >  products(name,price)</span>
-<span class='line line-3 ' >VALUES</span>
-<span class='line line-4 ' >  ("MacBook",999.999)</span></code></pre>
+<pre><code data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >hash = { </span>
+<span class='line line-2 ' >  foo: "bar",</span>
+<span class='line line-3 ' >  blah: 12</span>
+<span class='line line-4 ' >}</span>
+<span class='line line-5 ' >response = Hashie::Mash.new(hash)</span>
+<span class='line line-6 ' >response.foo</span>
+<span class='line line-7 ' ># => "bar"</span></code></pre>
 </section>
 <section class='CODE'>
-<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >product.update_attribute(:price,"999.999")</span>
+<pre><code data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >Response = ImmutableStruct.new(:foo)</span>
 <span class='line line-2 ' ></span>
-<span class='line line-3 ' >#</span></code></pre>
+<span class='line line-3 ' >response = Response.new(hash)</span>
+<span class='line line-4 ' ># blah is ignored</span>
+<span class='line line-5 ' >response.foo</span>
+<span class='line line-6 ' ># => "bar"</span></code></pre>
+</section>
+<section class='NORMAL'>
+<h1>Avoid passing around the Hash.</h1>
+</section>
+<section class='SECTION'>
+<h1>But Hashes and Strings are so darn handy!</h1>
 </section>
 <section class='BULLETS'>
-<h1>Strings & Hashes are for <em>Serialization</em></h1>
+<h1>Discover vs Implement</h1>
 <ul>
-<li>Your database</li>
-<li>APIs</li>
-<li>User Input</li>
-<li>Files</li>
+<li>Hashes and Strings are great when you don't know what types you need</li>
+<li>They let you move fast and iterate</li>
+<li>But when you are done…lock them down</li>
+</ul>
+</section>
+<section class='BULLETS'>
+<h1>In Conclusion</h1>
+<ul>
+<li>Data types make your code comprehensible</li>
+<li>Data types contain bugs to their source</li>
+<li>Data types puts your domain knowledge <em>in code</em>, not documentation</li>
 </ul>
 </section>
 <section class='SECTION'>
-<h1>They are not the basis of sound logic</h1>
+<h1>Thanks!</h1>
+<h2>Dave Copeland | @davetron5000</h2>
 </section>
 <section class='SECTION'>
-<h1>They are not the basis of testable code</h1>
-</section>
-<section class='SECTION'>
-<h1>They are not the basis of reliable systems</h1>
-</section>
-<section class='SECTION'>
-<h1></h1>
+<h1>Come Work at Stitch Fix</h1>
+<h2>dave@stitchfix.com</h2>
+<h3>UX • Engineering • DevOps</h3>
 </section>
 
     </div>

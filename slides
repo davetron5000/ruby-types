@@ -23,14 +23,13 @@ lazer_watch  = Product.new("JBIWLC-5000" , 100000.1234)
 !SECTION
 Are <code>macbook</code> and <code>macbook2</code> the same price?
 
-!CODE: language=ruby, callout=1,2
+!CODE: language=ruby callout=1,2
 macbook      = Product.new("Macbook"     , 999.10)
 macbook2     = Product.new("Macbook 2"   , "999.10")
 power_supply = Product.new("Power Brick" , 20.20)
 lazer_watch  = Product.new("JBIWLC-5000" , 100000.1234)
 
 !CODE: language=ruby
-
 macbook.price == macbook2.price
 
 # => false
@@ -39,7 +38,7 @@ macbook.price == macbook2.price
 !SECTION
 How much for a Macbook and a Power Brick?
 
-!CODE: language=ruby, callout=1,3
+!CODE: language=ruby callout=1,3
 macbook      = Product.new("Macbook"     , 999.10)
 macbook2     = Product.new("Macbook 2"   , "999.10")
 power_supply = Product.new("Power Brick" , 20.20)
@@ -53,19 +52,37 @@ macbook.price + power_supply.price
 !SECTION
 Where do I get 34/100<sup>ths</sup> of a cent?
 
-!CODE: language=ruby
-require 'bigdecimal'
+!BULLETS
+The problem here
+* <code>Product</code> is being mis-used
+* Allowing bugs to be introduced in one place…
+* …but manifest in another
 
+!CODE: language=ruby
+class Product
+  def initialize(name,price)
+    @name = name
+    if a_lot == price ||
+       of_checks == price ||
+       and_other_validations == price ||
+       that.might(:should).not_be(:here)
+      @price = price
+    end
+
+  end
+end
+
+!CODE: language=ruby
 class Price
 
   attr_reader :price
 
   def initialize(price)
-    @price = BigDecimal.new(price.to_s)
+    @price = price
   end
 
   def to_s
-    @price.to_s("F")
+    @price.to_s
   end
 end
 
@@ -79,8 +96,15 @@ power_supply = Product.new("Power Brick" , Price.new(20.20))
 !SECTION
 Are <code>macbook</code> and <code>macbook2</code> the same price?
 
-!CODE: language=ruby
+!CODE: language=ruby, callout=1,6
+require 'bigdecimal'
+
 class Price
+
+  def initialize(price)
+    @price = BigDecimal.new(price.to_s)
+  end
+
   def ==(other)
     @price == other.price
   end
@@ -108,7 +132,7 @@ macbook.price + power_supply.price
 !SECTION
 Where do I get 34/100<sup>ths</sup> of a cent?
 
-!CODE: language=ruby, callout=4,5,6
+!CODE: language=ruby callout=4,5,6
 class Price
   def initialize(price)
     @price = BigDecimal.new(price.to_s)
@@ -127,15 +151,18 @@ What's half-off $15.55?
 
 !CODE: language=ruby
 class Price
-  def /(other)
-    Price.new(@price / other)
+  def /(val)
+    Price.new(@price / val)
   end
 end
 
 !CODE: language=ruby
 Price.new("15.55") / 2
 
-# => RuntimeError: 0.7775E1 is not a price
+# => RuntimeError: 7.775 is not a price
+
+!SECTION
+We haven't thought through our “half-off” feature
 
 !SECTION
 Had we used floats or strings, 
@@ -150,24 +177,10 @@ superman_3.jpg
 !IMAGE
 office_space.jpg
 
-!SECTION
-<code>Price</code> is a <em>Data Type</em>
+!IMAGE
+rounding.png
 
-!BULLETS
-Data Type
-* Set of allowed values
-* Set of allowed operations
-
-!BULLETS
-Half-off
-* 15.55 is an allowed value
-* Divide by an integer is an allowed operation
-* 7.775—the result of dividing 15.55 by 2—is <strong>not</strong> an allowed value
-
-!SECTION
-We haven't thought through our “half-off” feature
-
-!CODE: language=ruby, callout=4
+!CODE: language=ruby callout=4
 class Price
   def /(other)
     quotient = @price / other
@@ -175,51 +188,408 @@ class Price
   end
 end
 
+!SECTION
+<code>Price</code> is a <em>Data Type</em>
+
 !BULLETS
-Questions
-* When dividing prices, what rounding method do we use?
-* <strong>A:</strong> <code>Price</code>
-* Can there be negative prices?
-* <strong>A:</strong> <code>Price</code>
-* etc.
+Data Type
+* Set of allowed values (999, 20.20, but <em>not</em> 100000.1234)
+* Set of allowed operations (<code>==</code>, <code>+</code>, <code>/</code>)
 
 !SECTION
-But the world wants nothing but Strings!!!!
+<code>Price</code> becomes the embodiment of our domain decisions around pricing.
+(which kinda makes sense)
+
+!SECTION
+Data Types aren't just for wrapping values
+
+!CODE: language=ruby
+ActiveRecord::Base.establish_connection(
+  adapter:  "postgres",
+  host:     "localhost",
+  username: "myuser",
+  password: "mypass",
+  database: "somedatabase",
+  poool:    25,
+)
+
+!CODE: language=ruby callout=7
+ActiveRecord::Base.establish_connection(
+  adapter:  "postgres",
+  host:     "localhost",
+  username: "myuser",
+  password: "mypass",
+  database: "somedatabase",
+  poool:    25,
+)
+
+!NORMAL
+Magic. Strings.
+
+!CODE: language=ruby
+class PostgresConnection
+  def initialize(host:,
+                 username:,
+                 password:,
+                 database:,
+                 pool: 5)
+    @host     = host
+    @username = username
+    @password = password
+    @database = database
+    @pool     = pool
+  end
+
+  def to_active_record_config
+    {
+       adapter: "postgres",
+          host: @host,
+      username: @username,
+      password: @password,
+      database: @database,
+          pool: @pool,
+    }
+  end
+end
+
+!CODE: language=ruby
+ActiveRecord.establish_connection(PostgresConnection.new(
+                                       host: "localhost",
+                                   username: "myuser",
+                                   password: "mypass",
+                                   database: "somedatabase",
+                                      poool: 25,
+                                 ).to_active_record_config)
+# => ArgumentError: unknown keyword: poool
+
+!SECTION
+But the world wants nothing but Strings and Hashes!!!!
+
+!SECTION
+Hashes, Strings, Number, Symbols etc. are <strong>primitives</strong> to use for <em>building</em> data types.
+
+!SECTION
+Avoid using them directly
+Convert primitives to your types early and often
+
+!SECTION
+Consider the seams of your application
+
+!IMAGE
+app.png
+
+!IMAGE
+app_seams.png
+
+!IMAGE
+app_adapt.png
+
+!SECTION
+How?
+
+!SECTION
+Database/ActiveRecord
+
+!CODE: language=ruby
+class Product < ActiveRecord::Base
+  serialize :price, Price
+end
+
+!CODE: language=ruby
+class Price
+  def self.load(raw)
+    self.new(raw)
+  end
+
+  def self.dump(price)
+    price.to_s
+  end
+end
+
+!COMMANDLINE
+> Product.connection.execute("update product set price=123.456 where id = 23")
+true
+> Product.find(23)
+ArgumentError: 123.456 is not a price
+
+!SECTION
+Bugs: Contained
+
+!BULLETS
+User Input
+* Wrap as necessary
+* Conventions can help
+* This is the trickiest
+
+!SECTION
+Example
+
+!CODE
+puts "Create a new Product"
+
+puts "Name?"
+name = readline
+
+puts "Price?"
+price = readline
+
+Product.new(name,Price.new(price))
+
+!SECTION
+This is a bit tedious
+
+!CODE
+class Product
+  def initialize(name,price)
+    @name  = name
+    @price = price.kind_of?(Price) ? price : Price.new(price)
+  end
+end
+
+Product.new(name,price)
+Product.new(name,Price.new(price))
+
+!SECTION
+Conversion Function
+
+!COMMANDLINE
+> Integer(10)
+10 
+> Integer("10")
+10 
+> Float(10.0)
+10.0 
+> Float("10")
+10.0 
+> Array([1,2,3])
+[1, 2, 3] 
+> Array(nil)
+[] 
+
+!CODE: language=ruby
+class Product
+  def initialize(name,price)
+    @name  = name
+    @price = Price(price)
+  end
+end
+
+Product.new(name,price)
+
+!SECTION
+Protocols
+
+!BULLETS
+Opt-in to say “I can be treated as an XXX”
+* <code>to_int</code> - I can be treated as an <code>Int</code>
+* <code>to_ary</code> - I can be treated as an <code>Array</code>
+* <code>to_str</code> - I can be treated as a <code>String</code>
+
+!BULLETS
+Not be cofused with <em>representations</em>
+* <code>to_i</code> - I can be <em>represented</em> as an <code>Int</code>
+* <code>to_a</code> - I can be <em>represented</em> as an <code>Array</code>
+* <code>to_s</code> - I can be <em>represented</em> as a <code>String</code>
+
+!COMMANDLINE
+> "Answer is: " + true
+TypeError: no implicit conversion of true into String
+	from (irb):1:in `+'
+	from (irb):1
+	from /Users/davec/.rvm/rubies/ruby-2.1.5/bin/irb:11:in `<main>'
+> class TrueClass
+>   def to_str; to_s; end
+> end
+ => :to_str 
+2.1.5 :007 > "Answer is: " + true
+ => "Answer is: true" 
+
+!CODE
+class Price
+  def to_price
+    self
+  end
+
+  def initialize(price)
+    @price = begin
+               price.to_price.price
+             rescue NoMethodError
+               BigDecimal.new(price.to_s)
+             end
+  end
+end
+
+!CODE
+class Share
+  def initialize(symbol,share_price)
+    @symbol = symbol
+    @share_price = share_price
+  end
+
+  def to_price
+    Price.new(@share_price)
+  end
+end
+
+!NORMAL
+Conversion functions and protocols let you safely convert where you need it
+
+!SECTION
+What about complex types e.g. API responses?
+
+!SECTION
+Easily convert between a <code>Hash</code> and your data type
+
+!BULLETS
+Class Factories
+* <a href="https://github.com/tcrayford/Values">Values</a>
+* <a href="https://github.com/stitchfix/immutable-struct">immutable-struct</a>
+
+!CODE: language=ruby
+Product = ImmutableStruct.new(:name, :price)
+
+hash = {
+  name: "MacBook",
+  price: Price(999.10),
+}
+macbook = Product.new(has)
+macbook.to_h
+# => { "name" => "MacBook", price: "999.10" }
+
+!SECTION
+But…
 
 !CODE: language=json
 {
-  "product": {
-    "name": "MacBook",
-    "price": "999.999"
-  }
+  "url": "https://api.github.com/repos/octocat/Hello-World/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e",
+  "sha": "6dcb09b5b57875f334f61aebed695e2e4193db5e",
+  "html_url": "https://github.com/octocat/Hello-World/commit/6dcb09b5b57875f334f61aebed695e2e4193db5e",
+  "comments_url": "https://api.github.com/repos/octocat/Hello-World/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e/comments",
+  "commit": {
+    "url": "https://api.github.com/repos/octocat/Hello-World/git/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e",
+    "author": {
+      "name": "Monalisa Octocat",
+      "email": "support@github.com",
+      "date": "2011-04-14T16:00:49Z"
+    },
+    "committer": {
+      "name": "Monalisa Octocat",
+      "email": "support@github.com",
+      "date": "2011-04-14T16:00:49Z"
+    },
+    "message": "Fix all the bugs",
+    "tree": {
+      "url": "https://api.github.com/repos/octocat/Hello-World/tree/6dcb09b5b57875f334f61aebed695e2e4193db5e",
+      "sha": "6dcb09b5b57875f334f61aebed695e2e4193db5e"
+    },
+    "comment_count": 0
+  },
+  "author": {
+    "login": "octocat",
+    "id": 1,
+    "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/octocat",
+    "html_url": "https://github.com/octocat",
+    "followers_url": "https://api.github.com/users/octocat/followers",
+    "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+    "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+    "organizations_url": "https://api.github.com/users/octocat/orgs",
+    "repos_url": "https://api.github.com/users/octocat/repos",
+    "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/octocat/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "committer": {
+    "login": "octocat",
+    "id": 1,
+    "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/octocat",
+    "html_url": "https://github.com/octocat",
+    "followers_url": "https://api.github.com/users/octocat/followers",
+    "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+    "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+    "organizations_url": "https://api.github.com/users/octocat/orgs",
+    "repos_url": "https://api.github.com/users/octocat/repos",
+    "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/octocat/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "parents": [
+    {
+      "url": "https://api.github.com/repos/octocat/Hello-World/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e",
+      "sha": "6dcb09b5b57875f334f61aebed695e2e4193db5e"
+    }
+  ],
+  "stats": {
+    "additions": 104,
+    "deletions": 4,
+    "total": 108
+  },
+  "files": [
+    {
+      "filename": "file1.txt",
+      "additions": 10,
+      "deletions": 2,
+      "changes": 12,
+      "status": "modified",
+      "raw_url": "https://github.com/octocat/Hello-World/raw/7ca483543807a51b6079e54ac4cc392bc29ae284/file1.txt",
+      "blob_url": "https://github.com/octocat/Hello-World/blob/7ca483543807a51b6079e54ac4cc392bc29ae284/file1.txt",
+      "patch": "@@ -29,7 +29,7 @@\n....."
+    }
+  ]
 }
 
-!CODE: language=sql
-INSERT INTO 
-  products(name,price)
-VALUES
-  ("MacBook",999.999)
+!NORMAL
+Two strategies
 
-!CODE: language=ruby
-product.update_attribute(:price,"999.999")
+!CODE
+hash = { 
+  foo: "bar",
+  blah: 12
+}
+response = Hashie::Mash.new(hash)
+response.foo
+# => "bar"
 
-#
+!CODE
+Response = ImmutableStruct.new(:foo)
+
+response = Response.new(hash)
+# blah is ignored
+response.foo
+# => "bar"
+
+!NORMAL
+Avoid passing around the Hash.
+
+!SECTION
+But Hashes and Strings are so darn handy!
 
 !BULLETS
-Strings & Hashes are for <em>Serialization</em>
-* Your database
-* APIs
-* User Input
-* Files
+Discover vs Implement
+* Hashes and Strings are great when you don't know what types you need
+* They let you move fast and iterate
+* But when you are done…lock them down
+
+!BULLETS
+In Conclusion
+* Data types make your code comprehensible
+* Data types contain bugs to their source
+* Data types puts your domain knowledge <em>in code</em>, not documentation
 
 !SECTION
-They are not the basis of sound logic
+Thanks!
+Dave Copeland | @davetron5000
 
 !SECTION
-They are not the basis of testable code
-
-!SECTION
-They are not the basis of reliable systems
-
-!SECTION
-
+Come Work at Stitch Fix
+dave@stitchfix.com
+UX • Engineering • DevOps
