@@ -53,7 +53,7 @@
 <span class='line line-5 ' ></span>
 <span class='line line-6 ' >#</span></code></pre>
 </section>
-<section class='SECTION'>
+<section class='NORMAL'>
 <h1>Are <code>macbook</code> and <code>macbook2</code> the same price?</h1>
 </section>
 <section class='CODE'>
@@ -68,7 +68,7 @@
 <span class='line line-3 ' ># => false</span>
 <span class='line line-4 ' ></span></code></pre>
 </section>
-<section class='SECTION'>
+<section class='NORMAL'>
 <h1>How much for a Macbook and a Power Brick?</h1>
 </section>
 <section class='CODE'>
@@ -82,7 +82,7 @@
 <span class='line line-2 ' ></span>
 <span class='line line-3 ' ># => 1019.3000000000001 </span></code></pre>
 </section>
-<section class='SECTION'>
+<section class='NORMAL'>
 <h1>Where do I get 34/100<sup>ths</sup> of a cent?</h1>
 </section>
 <section class='BULLETS'>
@@ -128,7 +128,7 @@
 <span class='line line-4 ' ></span>
 <span class='line line-5 ' >#</span></code></pre>
 </section>
-<section class='SECTION'>
+<section class='NORMAL'>
 <h1>Are <code>macbook</code> and <code>macbook2</code> the same price?</h1>
 </section>
 <section class='CODE'>
@@ -143,14 +143,18 @@
 <span class='line line-9 ' >  def ==(other)</span>
 <span class='line line-10 ' >    @price == other.price</span>
 <span class='line line-11 ' >  end</span>
-<span class='line line-12 ' >end</span>
-<span class='line line-13 ' ></span>
-<span class='line line-14 ' >macbook.price == macbook2.price</span>
-<span class='line line-15 ' ></span>
-<span class='line line-16 ' ># => true</span>
-<span class='line line-17 ' ></span></code></pre>
+<span class='line line-12 ' ></span>
+<span class='line line-13 ' >  def to_s</span>
+<span class='line line-14 ' >    @price.to_s("F")</span>
+<span class='line line-15 ' >  end</span>
+<span class='line line-16 ' >end</span>
+<span class='line line-17 ' ></span>
+<span class='line line-18 ' >macbook.price == macbook2.price</span>
+<span class='line line-19 ' ></span>
+<span class='line line-20 ' ># => true</span>
+<span class='line line-21 ' ></span></code></pre>
 </section>
-<section class='SECTION'>
+<section class='NORMAL'>
 <h1>How much for a Macbook and a Power Brick?</h1>
 </section>
 <section class='CODE'>
@@ -164,7 +168,7 @@
 <span class='line line-8 ' ></span>
 <span class='line line-9 ' ># => 1019.3</span></code></pre>
 </section>
-<section class='SECTION'>
+<section class='NORMAL'>
 <h1>Where do I get 34/100<sup>ths</sup> of a cent?</h1>
 </section>
 <section class='CODE'>
@@ -181,7 +185,7 @@
 <span class='line line-11 ' ></span>
 <span class='line line-12 ' ># => RuntimeError: 100000.1234 is not a price</span></code></pre>
 </section>
-<section class='SECTION'>
+<section class='NORMAL'>
 <h1>What's half-off $15.55?</h1>
 </section>
 <section class='CODE'>
@@ -199,11 +203,11 @@
 <section class='SECTION'>
 <h1>We haven't thought through our “half-off” feature</h1>
 </section>
-<section class='SECTION'>
+<section class='NORMAL'>
 <h1>Had we used floats or strings, </h1>
 <h2>somewhere that half a cent would get rounded.</h2>
 </section>
-<section class='SECTION'>
+<section class='NORMAL'>
 <h1>Would you know where?</h1>
 </section>
 <section class='IMAGE'>
@@ -233,7 +237,7 @@
 <li>Set of allowed operations (<code>==</code>, <code>+</code>, <code>/</code>)</li>
 </ul>
 </section>
-<section class='SECTION'>
+<section class='NORMAL'>
 <h1><code>Price</code> becomes the embodiment of our domain decisions around pricing.</h1>
 <h2>(which kinda makes sense)</h2>
 </section>
@@ -265,51 +269,57 @@
 </section>
 <section class='CODE'>
 <pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class PostgresConnection</span>
-<span class='line line-2 ' >  def initialize(host:,</span>
-<span class='line line-3 ' >                 username:,</span>
-<span class='line line-4 ' >                 password:,</span>
-<span class='line line-5 ' >                 database:,</span>
-<span class='line line-6 ' >                 pool: 5)</span>
-<span class='line line-7 ' >    @host     = host</span>
-<span class='line line-8 ' >    @username = username</span>
-<span class='line line-9 ' >    @password = password</span>
-<span class='line line-10 ' >    @database = database</span>
-<span class='line line-11 ' >    @pool     = pool</span>
-<span class='line line-12 ' >  end</span>
-<span class='line line-13 ' ></span>
-<span class='line line-14 ' >  def to_active_record_config</span>
-<span class='line line-15 ' >    {</span>
-<span class='line line-16 ' >       adapter: "postgres",</span>
-<span class='line line-17 ' >          host: @host,</span>
-<span class='line line-18 ' >      username: @username,</span>
-<span class='line line-19 ' >      password: @password,</span>
-<span class='line line-20 ' >      database: @database,</span>
-<span class='line line-21 ' >          pool: @pool,</span>
-<span class='line line-22 ' >    }</span>
-<span class='line line-23 ' >  end</span>
-<span class='line line-24 ' >end</span></code></pre>
+<span class='line line-2 ' >  def initialize(host:, username:, password:, database:, pool: 5)</span>
+<span class='line line-3 ' >    @host     = host</span>
+<span class='line line-4 ' >    @username = username</span>
+<span class='line line-5 ' >    @password = password</span>
+<span class='line line-6 ' >    @database = database</span>
+<span class='line line-7 ' >    @pool     = pool</span>
+<span class='line line-8 ' >  end</span>
+<span class='line line-9 ' ></span>
+<span class='line line-10 ' >  def to_active_record_config</span>
+<span class='line line-11 ' >    {</span>
+<span class='line line-12 ' >       adapter: "postgres",</span>
+<span class='line line-13 ' >          host: @host,</span>
+<span class='line line-14 ' >      username: @username,</span>
+<span class='line line-15 ' >      password: @password,</span>
+<span class='line line-16 ' >      database: @database,</span>
+<span class='line line-17 ' >          pool: @pool,</span>
+<span class='line line-18 ' >    }</span>
+<span class='line line-19 ' >  end</span>
+<span class='line line-20 ' >end</span></code></pre>
 </section>
 <section class='CODE'>
-<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >ActiveRecord.establish_connection(PostgresConnection.new(</span>
-<span class='line line-2 ' >                                       host: "localhost",</span>
-<span class='line line-3 ' >                                   username: "myuser",</span>
-<span class='line line-4 ' >                                   password: "mypass",</span>
-<span class='line line-5 ' >                                   database: "somedatabase",</span>
-<span class='line line-6 ' >                                      poool: 25,</span>
-<span class='line line-7 ' >                                 ).to_active_record_config)</span>
-<span class='line line-8 ' ># => ArgumentError: unknown keyword: poool</span></code></pre>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >ActiveRecord.establish_connection(</span>
+<span class='line line-2 ' >    PostgresConnection.new(host: "localhost",</span>
+<span class='line line-3 ' >                       username: "myuser",</span>
+<span class='line line-4 ' >                       password: "mypass",</span>
+<span class='line line-5 ' >                       database: "somedatabase",</span>
+<span class='line line-6 ' >                          poool: 25).to_active_record_config)</span>
+<span class='line line-7 ' ># => ArgumentError: unknown keyword: poool</span></code></pre>
+</section>
+<section class='CODE'>
+<pre><code class='ruby,' data-strikeouts='' data-callout-lines='3,7'><span class='line line-1 ' >class PostgresConnection</span>
+<span class='line line-2 ' >  def initialize(host:, username:, password:, database:, pool: 5)</span>
+<div class='lines-callout'><span class='line line-3 line-callout' >    @host     = Hostname.new(host)</span>
+</div><span class='line line-4 ' >    @username = username</span>
+<span class='line line-5 ' >    @password = password</span>
+<span class='line line-6 ' >    @database = database</span>
+<div class='lines-callout'><span class='line line-7 line-callout' >    @pool     = PoolSize.new(pool)</span>
+</div><span class='line line-8 ' >  end</span>
+<span class='line line-9 ' >end</span></code></pre>
 </section>
 <section class='SECTION'>
 <h1>But the world wants nothing but Strings and Hashes!!!!</h1>
 </section>
-<section class='SECTION'>
+<section class='NORMAL'>
 <h1>Hashes, Strings, Number, Symbols etc. are <strong>primitives</strong> to use for <em>building</em> data types.</h1>
 </section>
-<section class='SECTION'>
+<section class='NORMAL'>
 <h1>Avoid using them directly</h1>
 <h2>Convert primitives to your types early and often</h2>
 </section>
-<section class='SECTION'>
+<section class='NORMAL'>
 <h1>Consider the seams of your application</h1>
 </section>
 <section class='IMAGE'>
@@ -321,7 +331,7 @@
 <section class='IMAGE'>
 <img src='app_adapt.png'>
 </section>
-<section class='SECTION'>
+<section class='NORMAL'>
 <h1>How?</h1>
 </section>
 <section class='SECTION'>
@@ -350,7 +360,7 @@
 <span class='cli-element cli-result'><span class='cli-line'>ArgumentError: 123.456 is not a price</span></span>
 </code></pre>
 </section>
-<section class='SECTION'>
+<section class='NORMAL'>
 <h1>Bugs: Contained</h1>
 </section>
 <section class='BULLETS'>
@@ -361,11 +371,11 @@
 <li>This is the trickiest</li>
 </ul>
 </section>
-<section class='SECTION'>
+<section class='NORMAL'>
 <h1>Example</h1>
 </section>
 <section class='CODE'>
-<pre><code data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >puts "Create a new Product"</span>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >puts "Create a new Product"</span>
 <span class='line line-2 ' ></span>
 <span class='line line-3 ' >puts "Name?"</span>
 <span class='line line-4 ' >name = readline</span>
@@ -375,11 +385,11 @@
 <span class='line line-8 ' ></span>
 <span class='line line-9 ' >Product.new(name,Price.new(price))</span></code></pre>
 </section>
-<section class='SECTION'>
+<section class='NORMAL'>
 <h1>This is a bit tedious</h1>
 </section>
 <section class='CODE'>
-<pre><code data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class Product</span>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class Product</span>
 <span class='line line-2 ' >  def initialize(name,price)</span>
 <span class='line line-3 ' >    @name  = name</span>
 <span class='line line-4 ' >    @price = price.kind_of?(Price) ? price : Price.new(price)</span>
@@ -389,7 +399,7 @@
 <span class='line line-8 ' >Product.new(name,price)</span>
 <span class='line line-9 ' >Product.new(name,Price.new(price))</span></code></pre>
 </section>
-<section class='SECTION'>
+<section class='NORMAL'>
 <h1>Conversion Function</h1>
 </section>
 <section class='COMMANDLINE'>
@@ -408,65 +418,78 @@
 </code></pre>
 </section>
 <section class='CODE'>
-<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class Product</span>
-<span class='line line-2 ' >  def initialize(name,price)</span>
-<span class='line line-3 ' >    @name  = name</span>
-<span class='line line-4 ' >    @price = Price(price)</span>
-<span class='line line-5 ' >  end</span>
-<span class='line line-6 ' >end</span>
-<span class='line line-7 ' ></span>
-<span class='line line-8 ' >Product.new(name,price)</span></code></pre>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >def Price(price)</span>
+<span class='line line-2 ' >  price.kind_of?(Price) ? price : Price.new(price)</span>
+<span class='line line-3 ' >end</span>
+<span class='line line-4 ' ></span>
+<span class='line line-5 ' >class Product</span>
+<span class='line line-6 ' >  def initialize(name,price)</span>
+<span class='line line-7 ' >    @name  = name</span>
+<span class='line line-8 ' >    @price = Price(price)</span>
+<span class='line line-9 ' >  end</span>
+<span class='line line-10 ' >end</span>
+<span class='line line-11 ' ></span>
+<span class='line line-12 ' >Product.new(name,price)</span></code></pre>
 </section>
-<section class='SECTION'>
+<section class='CODE'>
+<pre><code class='ruby,' data-strikeouts='' data-callout-lines='4'><span class='line line-1 ' >class ChargeCustomerSomeMoneyJob</span>
+<span class='line line-2 ' >  def self.perform(customer,amount)</span>
+<span class='line line-3 ' >    CreditCardProcessor.charge!(customer.processor_id,</span>
+<div class='lines-callout'><span class='line line-4 line-callout' >                                Price(amount))</span>
+</div><span class='line line-5 ' >  end</span>
+<span class='line line-6 ' >end</span></code></pre>
+</section>
+<section class='NORMAL'>
 <h1>Protocols</h1>
 </section>
 <section class='BULLETS'>
-<h1>Opt-in to say “I can be treated as an XXX”</h1>
-<ul>
-<li><code>to_int</code> - I can be treated as an <code>Int</code></li>
-<li><code>to_ary</code> - I can be treated as an <code>Array</code></li>
-<li><code>to_str</code> - I can be treated as a <code>String</code></li>
-</ul>
-</section>
-<section class='BULLETS'>
-<h1>Not be cofused with <em>representations</em></h1>
+<h1>Representations</h1>
 <ul>
 <li><code>to_i</code> - I can be <em>represented</em> as an <code>Int</code></li>
 <li><code>to_a</code> - I can be <em>represented</em> as an <code>Array</code></li>
 <li><code>to_s</code> - I can be <em>represented</em> as a <code>String</code></li>
 </ul>
 </section>
+<section class='BULLETS'>
+<h1>Convertible to, i.e. “I can be treated as if I were an XXX”</h1>
+<ul>
+<li><code>to_int</code> - I can be treated as an <code>Int</code></li>
+<li><code>to_ary</code> - I can be treated as an <code>Array</code> (allows implementors to be “splatted”)</li>
+<li><code>to_str</code> - I can be treated as a <code>String</code> (allows implementors to be “added” to strings)</li>
+</ul>
+</section>
 <section class='COMMANDLINE'>
-<pre><code class='no-highlight'><span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> "Answer is: " + true</span>
-<span class='cli-element cli-result'><span class='cli-line'>TypeError: no implicit conversion of true into String</span>
+<pre><code class='no-highlight'><span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> price = Price.new(100)</span>
+<span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> "Cost is $" + price</span>
+<span class='cli-element cli-result'><span class='cli-line'>TypeError: no implicit conversion of Price into String</span>
 <span class='cli-line'>	from (irb):1:in `+'</span>
 <span class='cli-line'>	from (irb):1</span>
-<span class='cli-line'>	from /Users/davec/.rvm/rubies/ruby-2.1.5/bin/irb:11:in `<main>'</span></span>
-<span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> class TrueClass</span>
+<span class='cli-line'>	from /Users/davec/.rvm/rubies/ruby-2.1.5/bin/irb:11:in main</span></span>
+<span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> price.to_s</span>
+<span class='cli-element cli-result'><span class='cli-line'>100            </span></span>
+<span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> class Price</span>
 <span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'>   def to_str; to_s; end</span>
 <span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> end</span>
-<span class='cli-element cli-result'><span class='cli-line'> => :to_str </span>
-<span class='cli-line'>2.1.5 :007 > "Answer is: " + true</span>
-<span class='cli-line'> => "Answer is: true" </span></span>
+<span class='cli-element cli-result'><span class='cli-line'>:to_str </span></span>
+<span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> "Cost is $" + price</span>
+<span class='cli-element cli-result'><span class='cli-line'>"Cost is $100"</span></span>
 </code></pre>
 </section>
 <section class='CODE'>
-<pre><code data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class Price</span>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class Price</span>
 <span class='line line-2 ' >  def to_price</span>
 <span class='line line-3 ' >    self</span>
 <span class='line line-4 ' >  end</span>
-<span class='line line-5 ' ></span>
-<span class='line line-6 ' >  def initialize(price)</span>
-<span class='line line-7 ' >    @price = begin</span>
-<span class='line line-8 ' >               price.to_price.price</span>
-<span class='line line-9 ' >             rescue NoMethodError</span>
-<span class='line line-10 ' >               BigDecimal.new(price.to_s)</span>
-<span class='line line-11 ' >             end</span>
-<span class='line line-12 ' >  end</span>
-<span class='line line-13 ' >end</span></code></pre>
+<span class='line line-5 ' >end</span>
+<span class='line line-6 ' ></span>
+<span class='line line-7 ' >def Price(price)</span>
+<span class='line line-8 ' >  price.to_price</span>
+<span class='line line-9 ' >rescue NoMethodError</span>
+<span class='line line-10 ' >  Price.new(price)</span>
+<span class='line line-11 ' >end</span></code></pre>
 </section>
 <section class='CODE'>
-<pre><code data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class Share</span>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >class Share</span>
 <span class='line line-2 ' >  def initialize(symbol,share_price)</span>
 <span class='line line-3 ' >    @symbol = symbol</span>
 <span class='line line-4 ' >    @share_price = share_price</span>
@@ -475,37 +498,16 @@
 <span class='line line-7 ' >  def to_price</span>
 <span class='line line-8 ' >    Price.new(@share_price)</span>
 <span class='line line-9 ' >  end</span>
-<span class='line line-10 ' >end</span></code></pre>
+<span class='line line-10 ' >end</span>
+<span class='line line-11 ' ></span>
+<span class='line line-12 ' >price = Price(Share.new("OPWR",8.12))</span></code></pre>
 </section>
 <section class='NORMAL'>
 <h1>Conversion functions and protocols let you safely convert where you need it</h1>
+<h2>Makes handling I/O a lot simpler</h2>
 </section>
-<section class='SECTION'>
+<section class='NORMAL'>
 <h1>What about complex types e.g. API responses?</h1>
-</section>
-<section class='SECTION'>
-<h1>Easily convert between a <code>Hash</code> and your data type</h1>
-</section>
-<section class='BULLETS'>
-<h1>Class Factories</h1>
-<ul>
-<li><a href="https://github.com/tcrayford/Values">Values</a></li>
-<li><a href="https://github.com/stitchfix/immutable-struct">immutable-struct</a></li>
-</ul>
-</section>
-<section class='CODE'>
-<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >Product = ImmutableStruct.new(:name, :price)</span>
-<span class='line line-2 ' ></span>
-<span class='line line-3 ' >hash = {</span>
-<span class='line line-4 ' >  name: "MacBook",</span>
-<span class='line line-5 ' >  price: Price(999.10),</span>
-<span class='line line-6 ' >}</span>
-<span class='line line-7 ' >macbook = Product.new(has)</span>
-<span class='line line-8 ' >macbook.to_h</span>
-<span class='line line-9 ' ># => { "name" => "MacBook", price: "999.10" }</span></code></pre>
-</section>
-<section class='SECTION'>
-<h1>But…</h1>
 </section>
 <section class='CODE'>
 <pre><code class='json' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >{</span>
@@ -595,31 +597,59 @@
 <span class='line line-85 ' >  ]</span>
 <span class='line line-86 ' >}</span></code></pre>
 </section>
+<section class='BULLETS'>
+<h1>Two options</h1>
+<ul>
+<li>Wrap in an object-like wrapper</li>
+<li>Pluck what you need into a proper data type</li>
+</ul>
+</section>
+<section class='CODE'>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >response = Hashie::Mash.new(JSON.parse(response_from_github))</span>
+<span class='line line-2 ' >response.files[0].filename</span>
+<span class='line line-3 ' ># => "file1.txt"</span></code></pre>
+</section>
 <section class='NORMAL'>
-<h1>Two strategies</h1>
+<h1>Not a real data type</h1>
+</section>
+<section class='NORMAL'>
+<h1><em>But</em>…users don't have to deal with magic strings—you can replace it with a real data type later, based on usage</h1>
+</section>
+<section class='BULLETS'>
+<h1>Pluck What you need</h1>
+<ul>
+<li>Make a class each time</li>
+<li>Use a class factory like <a href="https://github.com/tcrayford/Values">Values</a> or <a href="https://github.com/stitchfix/immutable-struct">immutable-struct</a></li>
+</ul>
 </section>
 <section class='CODE'>
-<pre><code data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >hash = { </span>
-<span class='line line-2 ' >  foo: "bar",</span>
-<span class='line line-3 ' >  blah: 12</span>
-<span class='line line-4 ' >}</span>
-<span class='line line-5 ' >response = Hashie::Mash.new(hash)</span>
-<span class='line line-6 ' >response.foo</span>
-<span class='line line-7 ' ># => "bar"</span></code></pre>
+<pre><code class='ruby' data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >Author = ImmutableStruct.new(:login, :avatar_url)</span>
+<span class='line line-2 ' >Commit = ImmutableStruct.new(:url, :sha, :author)</span>
+<span class='line line-3 ' ></span>
+<span class='line line-4 ' >#</span></code></pre>
 </section>
-<section class='CODE'>
-<pre><code data-strikeouts='' data-callout-lines=''><span class='line line-1 ' >Response = ImmutableStruct.new(:foo)</span>
-<span class='line line-2 ' ></span>
-<span class='line line-3 ' >response = Response.new(hash)</span>
-<span class='line line-4 ' ># blah is ignored</span>
-<span class='line line-5 ' >response.foo</span>
-<span class='line line-6 ' ># => "bar"</span></code></pre>
+<section class='COMMANDLINE'>
+<pre><code class='no-highlight'><span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> Author.new(login: "davetron5000", avatar_url: "http://...")</span>
+<span class='cli-element cli-result'><span class='cli-line'>&lt;#Author @login="davetron5000" @avatar_url="http://..." &gt;</span></span>
+<span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> author = Author.new(github_response["author"])</span>
+<span class='cli-element cli-result'><span class='cli-line'>&lt;#Author ... &gt;</span></span>
+<span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> commit = Commit.new(github_response.merge(author: author))</span>
+<span class='cli-element cli-result'><span class='cli-line'>&lt;#Commit ... &gt;</span></span>
+<span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> commit.author.login</span>
+<span class='cli-element cli-result'><span class='cli-line'>"octocat"</span></span>
+<span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> commit.url</span>
+<span class='cli-element cli-result'><span class='cli-line'>"https://api.github.com/repos/octocat…</span></span>
+<span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> commit.html_url</span>
+<span class='cli-element cli-result'><span class='cli-line'>NoMethodError</span></span>
+<span class='cli-prompt'>&gt;</span> <span class='cli-element cli-command cli-line'> commit.to_h</span>
+<span class='cli-element cli-result'><span class='cli-line'>{ "url" => "...", "sha" => "...", "author" => { "name" => "...", "avatar_url" => "..." } }</span></span>
+</code></pre>
 </section>
 <section class='NORMAL'>
 <h1>Avoid passing around the Hash.</h1>
 </section>
 <section class='SECTION'>
-<h1>But Hashes and Strings are so darn handy!</h1>
+<h1>So…Hashes and Strings are dead to me now?</h1>
 </section>
 <section class='BULLETS'>
 <h1>Discover vs Implement</h1>

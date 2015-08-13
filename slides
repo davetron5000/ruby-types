@@ -20,7 +20,7 @@ lazer_watch  = Product.new("JBIWLC-5000" , 100000.1234)
 
 #
 
-!SECTION
+!NORMAL
 Are <code>macbook</code> and <code>macbook2</code> the same price?
 
 !CODE: language=ruby callout=1,2
@@ -35,7 +35,7 @@ macbook.price == macbook2.price
 # => false
 
 
-!SECTION
+!NORMAL
 How much for a Macbook and a Power Brick?
 
 !CODE: language=ruby callout=1,3
@@ -49,7 +49,7 @@ macbook.price + power_supply.price
 
 # => 1019.3000000000001 
 
-!SECTION
+!NORMAL
 Where do I get 34/100<sup>ths</sup> of a cent?
 
 !BULLETS
@@ -93,7 +93,7 @@ power_supply = Product.new("Power Brick" , Price.new(20.20))
 
 #
 
-!SECTION
+!NORMAL
 Are <code>macbook</code> and <code>macbook2</code> the same price?
 
 !CODE: language=ruby, callout=1,6
@@ -108,6 +108,10 @@ class Price
   def ==(other)
     @price == other.price
   end
+
+  def to_s
+    @price.to_s("F")
+  end
 end
 
 macbook.price == macbook2.price
@@ -115,7 +119,7 @@ macbook.price == macbook2.price
 # => true
 
 
-!SECTION
+!NORMAL
 How much for a Macbook and a Power Brick?
 
 !CODE: language=ruby
@@ -129,7 +133,7 @@ macbook.price + power_supply.price
 
 # => 1019.3
 
-!SECTION
+!NORMAL
 Where do I get 34/100<sup>ths</sup> of a cent?
 
 !CODE: language=ruby callout=4,5,6
@@ -146,7 +150,7 @@ lazer_watch  = Product.new("JBIWLC-5000" , Price.new(100000.1234))
 
 # => RuntimeError: 100000.1234 is not a price
 
-!SECTION
+!NORMAL
 What's half-off $15.55?
 
 !CODE: language=ruby
@@ -164,11 +168,11 @@ Price.new("15.55") / 2
 !SECTION
 We haven't thought through our “half-off” feature
 
-!SECTION
+!NORMAL
 Had we used floats or strings, 
 somewhere that half a cent would get rounded.
 
-!SECTION
+!NORMAL
 Would you know where?
 
 !IMAGE
@@ -196,7 +200,7 @@ Data Type
 * Set of allowed values (999, 20.20, but <em>not</em> 100000.1234)
 * Set of allowed operations (<code>==</code>, <code>+</code>, <code>/</code>)
 
-!SECTION
+!NORMAL
 <code>Price</code> becomes the embodiment of our domain decisions around pricing.
 (which kinda makes sense)
 
@@ -228,11 +232,7 @@ Magic. Strings.
 
 !CODE: language=ruby
 class PostgresConnection
-  def initialize(host:,
-                 username:,
-                 password:,
-                 database:,
-                 pool: 5)
+  def initialize(host:, username:, password:, database:, pool: 5)
     @host     = host
     @username = username
     @password = password
@@ -253,26 +253,36 @@ class PostgresConnection
 end
 
 !CODE: language=ruby
-ActiveRecord.establish_connection(PostgresConnection.new(
-                                       host: "localhost",
-                                   username: "myuser",
-                                   password: "mypass",
-                                   database: "somedatabase",
-                                      poool: 25,
-                                 ).to_active_record_config)
+ActiveRecord.establish_connection(
+    PostgresConnection.new(host: "localhost",
+                       username: "myuser",
+                       password: "mypass",
+                       database: "somedatabase",
+                          poool: 25).to_active_record_config)
 # => ArgumentError: unknown keyword: poool
+
+!CODE: language=ruby, callout=3,7
+class PostgresConnection
+  def initialize(host:, username:, password:, database:, pool: 5)
+    @host     = Hostname.new(host)
+    @username = username
+    @password = password
+    @database = database
+    @pool     = PoolSize.new(pool)
+  end
+end
 
 !SECTION
 But the world wants nothing but Strings and Hashes!!!!
 
-!SECTION
+!NORMAL
 Hashes, Strings, Number, Symbols etc. are <strong>primitives</strong> to use for <em>building</em> data types.
 
-!SECTION
+!NORMAL
 Avoid using them directly
 Convert primitives to your types early and often
 
-!SECTION
+!NORMAL
 Consider the seams of your application
 
 !IMAGE
@@ -284,7 +294,7 @@ app_seams.png
 !IMAGE
 app_adapt.png
 
-!SECTION
+!NORMAL
 How?
 
 !SECTION
@@ -312,7 +322,7 @@ true
 > Product.find(23)
 ArgumentError: 123.456 is not a price
 
-!SECTION
+!NORMAL
 Bugs: Contained
 
 !BULLETS
@@ -321,10 +331,10 @@ User Input
 * Conventions can help
 * This is the trickiest
 
-!SECTION
+!NORMAL
 Example
 
-!CODE
+!CODE: language=ruby
 puts "Create a new Product"
 
 puts "Name?"
@@ -335,10 +345,10 @@ price = readline
 
 Product.new(name,Price.new(price))
 
-!SECTION
+!NORMAL
 This is a bit tedious
 
-!CODE
+!CODE: language=ruby
 class Product
   def initialize(name,price)
     @name  = name
@@ -349,7 +359,7 @@ end
 Product.new(name,price)
 Product.new(name,Price.new(price))
 
-!SECTION
+!NORMAL
 Conversion Function
 
 !COMMANDLINE
@@ -367,6 +377,10 @@ Conversion Function
 [] 
 
 !CODE: language=ruby
+def Price(price)
+  price.kind_of?(Price) ? price : Price.new(price)
+end
+
 class Product
   def initialize(name,price)
     @name  = name
@@ -376,50 +390,59 @@ end
 
 Product.new(name,price)
 
-!SECTION
+!CODE: language=ruby, callout=4
+class ChargeCustomerSomeMoneyJob
+  def self.perform(customer,amount)
+    CreditCardProcessor.charge!(customer.processor_id,
+                                Price(amount))
+  end
+end
+
+!NORMAL
 Protocols
 
 !BULLETS
-Opt-in to say “I can be treated as an XXX”
-* <code>to_int</code> - I can be treated as an <code>Int</code>
-* <code>to_ary</code> - I can be treated as an <code>Array</code>
-* <code>to_str</code> - I can be treated as a <code>String</code>
-
-!BULLETS
-Not be cofused with <em>representations</em>
+Representations
 * <code>to_i</code> - I can be <em>represented</em> as an <code>Int</code>
 * <code>to_a</code> - I can be <em>represented</em> as an <code>Array</code>
 * <code>to_s</code> - I can be <em>represented</em> as a <code>String</code>
 
+!BULLETS
+Convertible to, i.e. “I can be treated as if I were an XXX”
+* <code>to_int</code> - I can be treated as an <code>Int</code>
+* <code>to_ary</code> - I can be treated as an <code>Array</code> (allows implementors to be “splatted”)
+* <code>to_str</code> - I can be treated as a <code>String</code> (allows implementors to be “added” to strings)
+
 !COMMANDLINE
-> "Answer is: " + true
-TypeError: no implicit conversion of true into String
+> price = Price.new(100)
+> "Cost is $" + price
+TypeError: no implicit conversion of Price into String
 	from (irb):1:in `+'
 	from (irb):1
-	from /Users/davec/.rvm/rubies/ruby-2.1.5/bin/irb:11:in `<main>'
-> class TrueClass
+	from /Users/davec/.rvm/rubies/ruby-2.1.5/bin/irb:11:in main
+> price.to_s
+100            
+> class Price
 >   def to_str; to_s; end
 > end
- => :to_str 
-2.1.5 :007 > "Answer is: " + true
- => "Answer is: true" 
+:to_str 
+> "Cost is $" + price
+"Cost is $100"
 
-!CODE
+!CODE: language=ruby
 class Price
   def to_price
     self
   end
-
-  def initialize(price)
-    @price = begin
-               price.to_price.price
-             rescue NoMethodError
-               BigDecimal.new(price.to_s)
-             end
-  end
 end
 
-!CODE
+def Price(price)
+  price.to_price
+rescue NoMethodError
+  Price.new(price)
+end
+
+!CODE: language=ruby
 class Share
   def initialize(symbol,share_price)
     @symbol = symbol
@@ -431,33 +454,14 @@ class Share
   end
 end
 
+price = Price(Share.new("OPWR",8.12))
+
 !NORMAL
 Conversion functions and protocols let you safely convert where you need it
+Makes handling I/O a lot simpler
 
-!SECTION
+!NORMAL
 What about complex types e.g. API responses?
-
-!SECTION
-Easily convert between a <code>Hash</code> and your data type
-
-!BULLETS
-Class Factories
-* <a href="https://github.com/tcrayford/Values">Values</a>
-* <a href="https://github.com/stitchfix/immutable-struct">immutable-struct</a>
-
-!CODE: language=ruby
-Product = ImmutableStruct.new(:name, :price)
-
-hash = {
-  name: "MacBook",
-  price: Price(999.10),
-}
-macbook = Product.new(has)
-macbook.to_h
-# => { "name" => "MacBook", price: "999.10" }
-
-!SECTION
-But…
 
 !CODE: language=json
 {
@@ -547,31 +551,54 @@ But…
   ]
 }
 
+!BULLETS
+Two options
+* Wrap in an object-like wrapper
+* Pluck what you need into a proper data type
+
+!CODE: language=ruby
+response = Hashie::Mash.new(JSON.parse(response_from_github))
+response.files[0].filename
+# => "file1.txt"
+
 !NORMAL
-Two strategies
+Not a real data type
 
-!CODE
-hash = { 
-  foo: "bar",
-  blah: 12
-}
-response = Hashie::Mash.new(hash)
-response.foo
-# => "bar"
+!NORMAL
+<em>But</em>…users don't have to deal with magic strings—you can replace it with a real data type later, based on usage
 
-!CODE
-Response = ImmutableStruct.new(:foo)
+!BULLETS
+Pluck What you need
+* Make a class each time
+* Use a class factory like <a href="https://github.com/tcrayford/Values">Values</a> or <a href="https://github.com/stitchfix/immutable-struct">immutable-struct</a>
 
-response = Response.new(hash)
-# blah is ignored
-response.foo
-# => "bar"
+!CODE: language=ruby
+Author = ImmutableStruct.new(:login, :avatar_url)
+Commit = ImmutableStruct.new(:url, :sha, :author)
+
+#
+
+!COMMANDLINE
+> Author.new(login: "davetron5000", avatar_url: "http://...")
+&lt;#Author @login="davetron5000" @avatar_url="http://..." &gt;
+> author = Author.new(github_response["author"])
+&lt;#Author ... &gt;
+> commit = Commit.new(github_response.merge(author: author))
+&lt;#Commit ... &gt;
+> commit.author.login
+"octocat"
+> commit.url
+"https://api.github.com/repos/octocat…
+> commit.html_url
+NoMethodError
+> commit.to_h
+{ "url" => "...", "sha" => "...", "author" => { "name" => "...", "avatar_url" => "..." } }
 
 !NORMAL
 Avoid passing around the Hash.
 
 !SECTION
-But Hashes and Strings are so darn handy!
+So…Hashes and Strings are dead to me now?
 
 !BULLETS
 Discover vs Implement
